@@ -6,6 +6,77 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestValidators(t *testing.T) {
+	t.Run("Integer Validator", func(t *testing.T) {
+		assert := assert.New(t)
+
+		var tests = []struct {
+			input    int64
+			kv       []string
+			expected bool
+		}{
+			{122, []string{"max:123"}, true},
+			{123, []string{"max:123"}, true},
+			{124, []string{"max:123"}, false},
+			{122, []string{"min:123"}, false},
+			{123, []string{"min:123"}, true},
+			{124, []string{"min:123"}, true},
+			{84, []string{"max:123", "min:43"}, true},
+			{42, []string{"max:123", "min:43"}, false},
+			{124, []string{"max:123", "min:43"}, false},
+		}
+
+		for _, test := range tests {
+			assert.Equal(test.expected, integerValidator(test.input, test.kv))
+		}
+	})
+
+	t.Run("Float Validator", func(t *testing.T) {
+		assert := assert.New(t)
+
+		tests := []struct {
+			input    float64
+			kv       []string
+			expected bool
+		}{
+			{43.345, []string{"max:43.346"}, true},
+			{43.346, []string{"max:43.346"}, true},
+			{43.347, []string{"max:43.346"}, false},
+			{43.345, []string{"min:43.346"}, false},
+			{43.346, []string{"min:43.346"}, true},
+			{43.347, []string{"min:43.346"}, true},
+		}
+
+		for _, test := range tests {
+			assert.Equal(test.expected, floatValidator(test.input, test.kv))
+		}
+	})
+
+	t.Run("String Validator", func(t *testing.T) {
+		assert := assert.New(t)
+
+		tests := []struct {
+			input    string
+			kv       []string
+			expected bool
+		}{
+			{"ABCDEFGHIJKLMNOPQ", []string{"max:18"}, true},
+			{"ABCDEFGHIJKLMNOPQR", []string{"max:18"}, true},
+			{"ABCDEFGHIJKLMNOPQRS", []string{"max:18"}, false},
+			{"ABCDEFGHIJKLMNOPQ", []string{"min:18"}, false},
+			{"ABCDEFGHIJKLMNOPQR", []string{"min:18"}, true},
+			{"ABCDEFGHIJKLMNOPQRS", []string{"min:18"}, true},
+			{"", []string{"max:12", "min:1"}, false},
+			{"A", []string{"max:12", "min:1"}, true},
+			{"ABCDEFGHIJKLMNOPQRS", []string{"max:12", "min:1"}, false},
+		}
+
+		for _, test := range tests {
+			assert.Equal(test.expected, stringValidator(test.input, test.kv))
+		}
+	})
+}
+
 func TestValidate(t *testing.T) {
 	type house struct {
 		Cost    int    `validator:"number,max:10000000"`
@@ -22,10 +93,10 @@ func TestValidate(t *testing.T) {
 		Name    string `validator:"string,min:6,max:20"`
 		Phone   string `validator:"string,regex:^09[0-9]{2}-[0-9]{6}$"`
 		Address string `validator:"string,max:70"`
-		Email   string
-		Age     int `validator:"number,min:1,max:120"`
-		Height  int `validator:"number,min:20,max:250"`
+		Age     int    `validator:"number,min:1,max:120"`
+		Height  int    `validator:"number,min:20,max:250"`
 		Asset   asset
+		Email   string
 	}
 
 	t.Run("Person Layer", func(t *testing.T) {
