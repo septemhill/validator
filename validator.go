@@ -8,7 +8,34 @@ import (
 	"strings"
 )
 
-const tagName = "validator"
+type dataType int
+
+const validateTag = "validator"
+
+const (
+	primitiveType dataType = iota
+	pointerType
+	structType
+	unsupportType
+)
+
+var kvStack = make([][]string, 0)
+var cnt = int64(0)
+
+func top() []string {
+	return kvStack[len(kvStack)-1]
+}
+
+func pop() []string {
+	l := len(kvStack)
+	v := kvStack[l-1]
+	kvStack = kvStack[0 : l-1]
+	return v
+}
+
+func push(kv []string) {
+	kvStack = append(kvStack, kv)
+}
 
 func stringValidator(val string, kv []string) bool {
 	for n := range kv {
@@ -69,45 +96,85 @@ func floatValidator(val float64, kv []string) bool {
 	return true
 }
 
-func validate(value reflect.Value, kv []string) bool {
+func primitiveValidate(value reflect.Value) bool {
 	switch value.Interface().(type) {
-	case int, int8, int16, int32, int64:
-		return integerValidator(value.Int(), kv)
+	case int, int8, int16, int32, int64,
+		uint, uint8, uint16, uint32, uint64:
+		return integerValidator(value.Int(), top())
 	case float32, float64:
-		return floatValidator(value.Float(), kv)
+		return floatValidator(value.Float(), top())
 	case string:
-		return stringValidator(value.String(), kv)
+		return stringValidator(value.String(), top())
 	default:
 		return false
 	}
 }
 
-func fieldsValidate(v interface{}) bool {
+func primitiveTypeCheck(value reflect.Value) dataType {
+	switch value.Type().Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Float32, reflect.Float64, reflect.String:
+		return primitiveType
+	case reflect.Ptr:
+		return pointerType
+	case reflect.Struct:
+		return structType
+	default:
+		return unsupportType
+	}
+}
+
+func structValidate(v interface{}) bool {
 	dt := reflect.TypeOf(v)
 	dv := reflect.ValueOf(v)
+	flag := true
 
 	for i := 0; i < dt.NumField(); i++ {
+		tags := dt.Field(i).Tag.Get(validateTag)
+		push(strings.Split(tags, ","))
+
 		switch dt.Field(i).Type.Kind() {
-		case reflect.Struct:
-			return fieldsValidate(dv.Field(i).Interface())
-		case reflect.Array:
-		case reflect.Slice:
-			data := reflect.ValueOf(dv.Field(i).Interface())
-			for j := 0; j < data.Len(); j++ {
-				if !fieldsValidate(data.Index(j).Interface()) {
-					return false
+		case reflect.Array, reflect.Slice:
+			if dv.Field(i).Len() > 0 {
+				t := primitiveTypeCheck(dv.Field(i).Index(0))
+				if t == primitiveType {
+					for j := 0; j < dv.Field(i).Len(); j++ {
+						if !primitiveValidate(dv.Field(i).Index(j)) {
+							return false
+						}
+					}
+				} else if t == pointerType {
+					for j := 0; j < dv.Field(i).Len(); j++ {
+						if !primitiveValidate(dv.Field(i).Index(j).Elem()) {
+							return false
+						}
+					}
+				} else if t == structType {
+					for j := 0; j < dv.Field(i).Len(); j++ {
+						if !structValidate(dv.Field(i).Index(j).Interface()) {
+							return false
+						}
+					}
+				} else {
+					fmt.Println("KerKer")
 				}
 			}
+		case reflect.Struct:
+			flag = structValidate(dv.Field(i).Interface())
 		case reflect.Ptr:
-			return fieldsValidate(dv.Field(i).Elem().Interface())
+			flag = structValidate(dv.Field(i).Elem().Interface())
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Float32, reflect.Float64, reflect.String:
-			ti := dt.Field(i).Tag.Get(tagName)
-			if !validate(dv.Field(i), strings.Split(ti, ",")) {
-				return false
-			}
+			flag = primitiveValidate(dv.Field(i))
 		default:
-			fmt.Println("Unsupport data type", dt.Field(i).Name)
+		}
+
+		pop()
+
+		if !flag {
+			return false
 		}
 	}
 
@@ -120,10 +187,11 @@ func Validate(v interface{}) bool {
 
 	switch dt.Kind() {
 	case reflect.Struct:
-		return fieldsValidate(v)
+		return structValidate(v)
 	case reflect.Ptr:
 		return Validate(dv.Elem().Interface())
 	default:
+		fmt.Println("unexpected data type")
 		return false
 	}
 }

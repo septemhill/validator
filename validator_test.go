@@ -45,6 +45,9 @@ func TestValidators(t *testing.T) {
 			{43.345, []string{"min:43.346"}, false},
 			{43.346, []string{"min:43.346"}, true},
 			{43.347, []string{"min:43.346"}, true},
+			{832.428, []string{"max:1111.1111", "min:333.33"}, true},
+			{333.323, []string{"max:1111.1111", "min:333.33"}, false},
+			{1111.1112, []string{"max:1111.1111", "min:333.33"}, false},
 		}
 
 		for _, test := range tests {
