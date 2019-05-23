@@ -72,6 +72,9 @@ func TestValidators(t *testing.T) {
 			{"", []string{"max:12", "min:1"}, false},
 			{"A", []string{"max:12", "min:1"}, true},
 			{"ABCDEFGHIJKLMNOPQRS", []string{"max:12", "min:1"}, false},
+			{"090A-123432", []string{"regex:^09[0-9]{2}-[0-9]{6}$"}, false},
+			{"0907123432", []string{"regex:^09[0-9]{2}-[0-9]{6}$"}, false},
+			{"0907-123432", []string{"regex:^09[0-9]{2}-[0-9]{6}$"}, true},
 		}
 
 		for _, test := range tests {
