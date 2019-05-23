@@ -80,7 +80,7 @@ func TestValidators(t *testing.T) {
 	})
 }
 
-func TestValidate(t *testing.T) {
+func TestNestedValidate(t *testing.T) {
 	type house struct {
 		Cost    int    `validator:"number,max:10000000"`
 		Address string `validator:"string,max:100"`
@@ -268,6 +268,129 @@ func TestValidate(t *testing.T) {
 
 		for _, test := range tests {
 			assert.Equal(Validate(test.input), test.expected, test.errMsg)
+		}
+	})
+}
+
+func TestCollectionValidate(t *testing.T) {
+	newFloat := func(v float64) *float64 {
+		s := new(float64)
+		*s = v
+		return s
+	}
+
+	t.Run("Primitive Collection Validate", func(t *testing.T) {
+		assert := assert.New(t)
+
+		type collection struct {
+			Array    [8]int     `validator:"min:10,max:20"`
+			Slice    []string   `validator:"min:10,max:20"`
+			SlicePtr []*float64 `validator:"min:10,max:20"`
+		}
+
+		tests := []struct {
+			input    collection
+			expected bool
+		}{
+			{
+				collection{
+					Array:    [8]int{1, 2, 3, 4, 5, 6, 7, 8},
+					Slice:    []string{"Septem", "Nicole", "Asolia"},
+					SlicePtr: []*float64{newFloat(12.343), newFloat(34.233), newFloat(97.8554)},
+				}, false,
+			}, {
+				collection{
+					Array:    [8]int{11, 12, 13, 14, 15, 16, 17, 18},
+					Slice:    []string{"Septem1117", "Nicole0721", "Asolia0524"},
+					SlicePtr: []*float64{newFloat(12.343), newFloat(11.233), newFloat(18.8554)},
+				}, true,
+			}, {
+				collection{
+					Array:    [8]int{19, 18, 17, 16, 15, 14, 13, 8},
+					Slice:    []string{"AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD", "EEEEEEEEEE"},
+					SlicePtr: []*float64{newFloat(11.93), newFloat(13.3293), newFloat(13.5994)},
+				}, false,
+			},
+		}
+
+		for _, test := range tests {
+			assert.Equal(test.expected, Validate(test.input))
+		}
+	})
+
+	t.Run("Structure Collection Validate", func(t *testing.T) {
+		assert := assert.New(t)
+
+		type inner struct {
+			Age    int     `validator:"min:18,max:120"`
+			Height float64 `validator:"min:40,max:250"`
+			Name   string  `validator:"min:6,max:20"`
+		}
+
+		type collection struct {
+			Array    [2]inner
+			Slice    []inner
+			SlicePtr []*inner
+		}
+
+		tests := []struct {
+			input    collection
+			expected bool
+		}{
+			{
+				collection{
+					Array: [2]inner{
+						inner{Age: 132, Height: 222, Name: "Nicker"},
+						inner{Age: 33, Height: 123, Name: "Boasher"},
+					},
+					Slice: []inner{
+						inner{Age: 100, Height: 188, Name: "Nicole"},
+						inner{Age: 111, Height: 169, Name: "Buster"},
+						inner{Age: 112, Height: 129, Name: "Nord"},
+					},
+					SlicePtr: []*inner{
+						&inner{Age: 20, Height: 444, Name: "Dicker"},
+						&inner{Age: 56, Height: 217, Name: "Zash"},
+						&inner{Age: 34, Height: 211, Name: "Nasher"},
+						&inner{Age: 67, Height: 142, Name: "Queen"},
+					},
+				}, false,
+			}, {
+				collection{
+					Array: [2]inner{
+						inner{Age: 56, Height: 123, Name: "Jackie"},
+						inner{Age: 82, Height: 149, Name: "Steven"},
+					},
+					Slice: []inner{
+						inner{Age: 19, Height: 139, Name: "Neo"},
+					},
+					SlicePtr: []*inner{
+						&inner{Age: 28, Height: 187, Name: "Docker"},
+						&inner{Age: 66, Height: 169, Name: "Chambers"},
+					},
+				}, false,
+			}, {
+				collection{
+					Array: [2]inner{
+						inner{Age: 20, Height: 120, Name: "Septem"},
+						inner{Age: 40, Height: 121, Name: "Asolia"},
+					},
+					Slice: []inner{
+						inner{Age: 60, Height: 122, Name: "Michael"},
+						inner{Age: 80, Height: 123, Name: "Joseph"},
+						inner{Age: 100, Height: 124, Name: "Johnny"},
+					},
+					SlicePtr: []*inner{
+						&inner{Age: 111, Height: 200, Name: "Austin"},
+						&inner{Age: 112, Height: 126, Name: "Martin"},
+						&inner{Age: 113, Height: 127, Name: "Wilson"},
+					},
+				}, true,
+			},
+		}
+
+		for _, test := range tests {
+			assert.Equal(test.expected, Validate(test.input))
 		}
 	})
 }

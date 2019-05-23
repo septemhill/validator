@@ -14,7 +14,8 @@ const validateTag = "validator"
 
 const (
 	primitiveType dataType = iota
-	pointerType
+	primitivePtrType
+	structPtrType
 	structType
 	unsupportType
 )
@@ -117,7 +118,10 @@ func primitiveTypeCheck(value reflect.Value) dataType {
 		reflect.Float32, reflect.Float64, reflect.String:
 		return primitiveType
 	case reflect.Ptr:
-		return pointerType
+		if primitiveTypeCheck(value.Elem()) == primitiveType {
+			return primitivePtrType
+		}
+		return structPtrType
 	case reflect.Struct:
 		return structType
 	default:
@@ -144,9 +148,15 @@ func structValidate(v interface{}) bool {
 							return false
 						}
 					}
-				} else if t == pointerType {
+				} else if t == primitivePtrType {
 					for j := 0; j < dv.Field(i).Len(); j++ {
 						if !primitiveValidate(dv.Field(i).Index(j).Elem()) {
+							return false
+						}
+					}
+				} else if t == structPtrType {
+					for j := 0; j < dv.Field(i).Len(); j++ {
+						if !structValidate(dv.Field(i).Index(j).Elem().Interface()) {
 							return false
 						}
 					}
