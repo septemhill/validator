@@ -6,7 +6,7 @@ steps:
   image: golang:1.11
   commands:
   - go get -t -d -v
-  - go test
+  - go test -v
 
 ---
 kind: pipeline
@@ -17,4 +17,4 @@ steps:
   image: golang:1.10
   commands:
   - go get -t -d -v
-  - go test
+  - go test -v
