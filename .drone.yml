@@ -13,7 +13,7 @@ steps:
   settings:
     webhook: 
       from_secret: slack_secret
-    channel: pri-validator-drone
+    channel: prj-validator-drone
     username: Drone CI
   when:
     status: [success, failure]
@@ -40,7 +40,7 @@ steps:
   settings:
     webhook:
       from_secret: slack_secret
-    channel: pri-validator-drone
+    channel: prj-validator-drone
     username: Drone CI
   when:
     status: [success, failure]
