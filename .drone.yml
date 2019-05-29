@@ -5,7 +5,8 @@ steps:
 - name: test
   image: golang:1.11
   settings:
-    webhook: slack_secret
+    webhook: 
+      from_secret: slack_secret
     channel: pri-validator-drone
     usernam: Drone CI
   when:
@@ -28,7 +29,8 @@ steps:
 - name: test
   image: golang:1.10
   settings:
-    webhook: slack_secret
+    webhook:
+      from_secret: slack_secret
     channel: pri-validator-drone
     usernam: Drone CI
   when:
