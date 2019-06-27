@@ -232,11 +232,11 @@ func TestNestedValidate(t *testing.T) {
 						Cash:   100000,
 						Credit: 300000,
 						Houses: []house{
-							house{
+							{
 								Cost:    150000000,
 								Address: "4382  Creekside Lane",
 							},
-							house{
+							{
 								Cost:    100001,
 								Address: "2587  Froe Street",
 							},
@@ -255,11 +255,11 @@ func TestNestedValidate(t *testing.T) {
 						Cash:   200000,
 						Credit: 500000,
 						Houses: []house{
-							house{
+							{
 								Cost:    500000,
 								Address: "3567  Valley Lane",
 							},
-							house{
+							{
 								Cost:    600000,
 								Address: "4891  Smith Road",
 							},
@@ -343,50 +343,50 @@ func TestCollectionValidate(t *testing.T) {
 			{
 				collection{
 					Array: [2]inner{
-						inner{Age: 132, Height: 222, Name: "Nicker"},
-						inner{Age: 33, Height: 123, Name: "Boasher"},
+						{Age: 132, Height: 222, Name: "Nicker"},
+						{Age: 33, Height: 123, Name: "Boasher"},
 					},
 					Slice: []inner{
-						inner{Age: 100, Height: 188, Name: "Nicole"},
-						inner{Age: 111, Height: 169, Name: "Buster"},
-						inner{Age: 112, Height: 129, Name: "Nord"},
+						{Age: 100, Height: 188, Name: "Nicole"},
+						{Age: 111, Height: 169, Name: "Buster"},
+						{Age: 112, Height: 129, Name: "Nord"},
 					},
 					SlicePtr: []*inner{
-						&inner{Age: 20, Height: 444, Name: "Dicker"},
-						&inner{Age: 56, Height: 217, Name: "Zash"},
-						&inner{Age: 34, Height: 211, Name: "Nasher"},
-						&inner{Age: 67, Height: 142, Name: "Queen"},
+						{Age: 20, Height: 444, Name: "Dicker"},
+						{Age: 56, Height: 217, Name: "Zash"},
+						{Age: 34, Height: 211, Name: "Nasher"},
+						{Age: 67, Height: 142, Name: "Queen"},
 					},
 				}, false,
 			}, {
 				collection{
 					Array: [2]inner{
-						inner{Age: 56, Height: 123, Name: "Jackie"},
-						inner{Age: 82, Height: 149, Name: "Steven"},
+						{Age: 56, Height: 123, Name: "Jackie"},
+						{Age: 82, Height: 149, Name: "Steven"},
 					},
 					Slice: []inner{
-						inner{Age: 19, Height: 139, Name: "Neo"},
+						{Age: 19, Height: 139, Name: "Neo"},
 					},
 					SlicePtr: []*inner{
-						&inner{Age: 28, Height: 187, Name: "Docker"},
-						&inner{Age: 66, Height: 169, Name: "Chambers"},
+						{Age: 28, Height: 187, Name: "Docker"},
+						{Age: 66, Height: 169, Name: "Chambers"},
 					},
 				}, false,
 			}, {
 				collection{
 					Array: [2]inner{
-						inner{Age: 20, Height: 120, Name: "Septem"},
-						inner{Age: 40, Height: 121, Name: "Asolia"},
+						{Age: 20, Height: 120, Name: "Septem"},
+						{Age: 40, Height: 121, Name: "Asolia"},
 					},
 					Slice: []inner{
-						inner{Age: 60, Height: 122, Name: "Michael"},
-						inner{Age: 80, Height: 123, Name: "Joseph"},
-						inner{Age: 100, Height: 124, Name: "Johnny"},
+						{Age: 60, Height: 122, Name: "Michael"},
+						{Age: 80, Height: 123, Name: "Joseph"},
+						{Age: 100, Height: 124, Name: "Johnny"},
 					},
 					SlicePtr: []*inner{
-						&inner{Age: 111, Height: 200, Name: "Austin"},
-						&inner{Age: 112, Height: 126, Name: "Martin"},
-						&inner{Age: 113, Height: 127, Name: "Wilson"},
+						{Age: 111, Height: 200, Name: "Austin"},
+						{Age: 112, Height: 126, Name: "Martin"},
+						{Age: 113, Height: 127, Name: "Wilson"},
 					},
 				}, true,
 			},
