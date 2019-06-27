@@ -191,6 +191,7 @@ func structValidate(v interface{}) bool {
 	return true
 }
 
+//Validate validates structure properties
 func Validate(v interface{}) bool {
 	dt := reflect.TypeOf(v)
 	dv := reflect.ValueOf(v)
