@@ -8,7 +8,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        echo 'Testing..'
+        sh 'go test -v'
       }
     }
     stage('Deploy') {
