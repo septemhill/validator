@@ -12,6 +12,7 @@ pipeline {
     }
     stage('Test') {
       steps {
+        sh 'go get ./...
         sh 'go test -v'
       }
     }
