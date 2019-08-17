@@ -1,7 +1,7 @@
 pipeline {
   agent {
         docker {
-            image 'septemhill/dockergolangit'
+            image 'septemhill/dockergolangit:latest'
         }
   }
   stages {
