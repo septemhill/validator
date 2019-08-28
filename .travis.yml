@@ -6,3 +6,6 @@ go:
 - "1.11"
 - "1.12.6"
 - master
+
+notifications:
+  slack: obsamworkspace:CkAsaDCf4HavBESkjLhHw33W
