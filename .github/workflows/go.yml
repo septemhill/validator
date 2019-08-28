@@ -26,3 +26,6 @@ jobs:
 
     - name: Build
       run: go build -v .
+
+    - name: GitHub Action for Slack
+      uses: Ilshidur/action-slack@1.5.0
