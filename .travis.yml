@@ -5,6 +5,7 @@ go:
 - 1.x
 - "1.11"
 - "1.12.6"
+- "1.13"
 - master
 
 notifications:
