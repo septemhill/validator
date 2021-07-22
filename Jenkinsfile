@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'septemhill/dockergolangit:latest'
+      image 'golangci/golangci-lint:latest'
     }
 
   }
